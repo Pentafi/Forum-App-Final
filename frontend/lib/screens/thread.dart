@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'addcomment.dart';
 
 class ThreadScreen extends StatelessWidget {
-  const ThreadScreen({super.key});
+  const ThreadScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

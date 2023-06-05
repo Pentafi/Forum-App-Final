@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
-import 'auth_provider.dart';
 
 class LoginScreen extends StatelessWidget {
   static const routeName = '/login';
@@ -8,6 +8,8 @@ class LoginScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  LoginScreen({super.key});
 
   void _submitLoginForm(BuildContext context) async {
     final username = _usernameController.text.trim();

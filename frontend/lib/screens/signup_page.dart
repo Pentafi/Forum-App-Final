@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/login_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({Key? key});
+  const SignupPage({super.key});
+
 
   @override
   _SignupPageState createState() => _SignupPageState();

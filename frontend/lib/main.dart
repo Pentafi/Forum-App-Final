@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/addcomment.dart';
-import 'package:frontend/auth_provider.dart';
-import 'package:frontend/createthread.dart';
-import 'package:frontend/forumlist.dart';
-import 'package:frontend/login_page.dart';
+import 'package:frontend/model/forum_model.dart';
+import 'package:frontend/model/topic_model.dart';
+import 'package:frontend/provider/auth_provider.dart';
+import 'package:frontend/provider/forum_provider.dart';
+import 'package:frontend/provider/topicprovider.dart';
+import 'package:frontend/screens/addcomment.dart';
+import 'package:frontend/screens/forumlist.dart';
+import 'package:frontend/screens/login_page.dart';
+import 'package:frontend/screens/new_topic_screen.dart';
+import 'package:frontend/screens/signup_page.dart';
+import 'package:frontend/screens/thread.dart';
+import 'package:frontend/screens/topic_screen.dart';
 import 'package:provider/provider.dart';
-import 'signup_page.dart';
-import 'thread.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (_) => AuthProvider(),
-    child: const MyApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => TopicProvider()),
+        ChangeNotifierProvider(create: (_) => ForumProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +41,23 @@ class MyApp extends StatelessWidget {
       routes: {
         '/signup': (context) => const SignupPage(),
         '/login': (context) => LoginScreen(),
-        '/ForumList': (context) =>   const ForumListScreen(),
-        '/Thread': (context) => ThreadScreen(),
-        '/CreateThread': (context) => CreateThreadScreen(),
+        '/ForumList': (context) => ForumListScreen(),
+        '/Thread': (context) => const ThreadScreen(),
+        '/CreateThread': (context) => const NewTopicScreen(forumId: '',),
+        '/TopicScreen': (context) {
+          final arguments = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
+          final topic = arguments['topic'] as TopicModel;
+          final forum = arguments['forum'] as ForumModel;
+          return TopicScreen(topic: topic, forum: forum);
+        },
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/AddComment') {
           final args = settings.arguments as Map<String, dynamic>;
           return MaterialPageRoute(
-            builder: (context) => AddCommentScreen(threadId: args['threadId'] as int),
+            builder: (context) =>
+                AddCommentScreen(threadId: args['threadId'] as int),
           );
         }
         return null;

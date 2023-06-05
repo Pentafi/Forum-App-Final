@@ -1,3 +1,4 @@
+from rest_framework import viewsets, permissions
 from rest_framework import serializers
 from .models import Section, Forum, Topic, Post, User
 
@@ -16,26 +17,40 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-
 class SectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
-        fields = ('id', 'title', 'created_at', 'updated_at')
-
+        fields = "__all__"
 
 class ForumSerializer(serializers.ModelSerializer):
     creator = UserSerializer(read_only=True)
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'section', 'creator', 'created_at', 'updated_at')
+        fields = ('id', 'title', 'description', 'section', 'creator', 'created_at', 'updated_at')
 
+class ForumViewSet(viewsets.ModelViewSet):
+    queryset = Forum.objects.all()
+    serializer_class = ForumSerializer
+    permission_classes = [permissions.IsAuthenticated]  
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
 
 class TopicSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(read_only=True)
+
     class Meta:
         model = Topic
-        fields = ('id', 'title', 'forum', 'creator', 'created_at', 'updated_at')
+        fields = ('id', 'title', 'description', 'creator', 'created_at', 'updated_at')
 
+    def create(self, validated_data):
+        creator = self.context['request'].user
+        topic = Topic.objects.create(
+            creator=creator,
+            **validated_data
+        )
+        return topic
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:

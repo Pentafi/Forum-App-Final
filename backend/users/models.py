@@ -11,6 +11,7 @@ class Section(models.Model):
 
 class Forum(models.Model):
     title = models.CharField(max_length=255)
+    description = models.TextField(max_length=255, default='Default Description')
     section = models.ForeignKey(Section, related_name='forums', on_delete=models.CASCADE)
     creator = models.ForeignKey(User, related_name='forums', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -21,13 +22,14 @@ class Forum(models.Model):
 
 class Topic(models.Model):
     title = models.CharField(max_length=255)
-    forum = models.ForeignKey(Forum, related_name='topics', on_delete=models.CASCADE)
+    description = models.TextField(max_length=255, default='Default Description')
     creator = models.ForeignKey(User, related_name='topics', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
+
 
 class Post(models.Model):
     topic = models.ForeignKey(Topic, related_name='posts', on_delete=models.CASCADE)

@@ -20,10 +20,17 @@ class AuthProvider with ChangeNotifier {
 
   User? get user => _user;
   String? get username => _user?.username;
-  String? get accessToken => _user?.accessToken;
+
+  static String? get accessToken => _instance?._user?.accessToken;
   String? get refreshToken => _user?.refreshToken;
 
- Future<void> login(String username, String password) async {
+  static AuthProvider? _instance;
+
+  AuthProvider() {
+    _instance = this;
+  }
+
+  Future<void> login(String username, String password) async {
   try {
     final response = await http.post(
       Uri.parse('http://127.0.0.1:8000/api/login/'),
@@ -40,28 +47,28 @@ class AuthProvider with ChangeNotifier {
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      final username = responseData['username'];
-      final accessToken = responseData['token'];
-      // Remove the line that assigns 'refreshToken'
+      final accessToken = responseData['access'];
+      final refreshToken = responseData['refresh'];
 
-      if (username != null && accessToken != null) {
+      if (accessToken != null) {
         _user = User(
-          username: username,
+          username: username, 
           accessToken: accessToken,
-          // Remove the line that assigns 'refreshToken'
+          refreshToken: refreshToken,
         );
         notifyListeners();
       } else {
-        throw Exception('Failed to get user data');
+        throw Exception('Failed to get access token');
       }
     } else {
       throw Exception('Failed to login');
     }
   } catch (error) {
     print('Login failed: $error');
-    throw error;
+    rethrow;
   }
 }
+
 
   Future<void> logout() async {
     final response = await http.post(

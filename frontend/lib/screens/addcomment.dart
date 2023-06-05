@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/auth_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AddCommentScreen extends StatefulWidget {
   final int threadId;
 
-  AddCommentScreen({required this.threadId});
+  const AddCommentScreen({super.key, required this.threadId});
 
   @override
   _AddCommentScreenState createState() => _AddCommentScreenState();
@@ -15,23 +16,26 @@ class _AddCommentScreenState extends State<AddCommentScreen> {
   final _commentController = TextEditingController();
 
   void _addComment() async {
-    final comment = _commentController.text;
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/posts/create/'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "message": comment,
-        "topic": widget.threadId,
-      }),
-    );
+  final comment = _commentController.text;
+  final response = await http.post(
+    Uri.parse('http://127.0.0.1:8000/api/posts/create/'),
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer ${AuthProvider.accessToken}',
+    },
+    body: jsonEncode({
+      "message": comment,
+      "topic": widget.threadId,
+    }),
+  );
 
-    if (response.statusCode == 201) {
-      // ignore: use_build_context_synchronously
-      Navigator.pop(context);
-    } else {
-      throw Exception('Failed to post comment');
-    }
+  if (response.statusCode == 201) {
+    Navigator.pop(context);
+  } else {
+    throw Exception('Failed to post comment');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
